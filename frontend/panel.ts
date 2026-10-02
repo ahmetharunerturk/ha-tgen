@@ -63,6 +63,8 @@ export class TimelapsePanel extends LitElement {
   private scheduleDrafts = new Map<string, Camera["schedules"]>();
   private settingsDraft?: State["settings"];
   private reconnecting = false;
+  private renewingVideo = false;
+  private lastVideoRenewal = 0;
 
   get admin() { return this.hass?.user?.is_admin === true; }
   get locale() { return this.language === "auto" ? this.hass?.language ?? "en" : this.language; }
@@ -155,20 +157,31 @@ export class TimelapsePanel extends LitElement {
   }
   private async watch(video: Video) {
     await this.operation(async () => {
+      this.lastVideoRenewal = 0;
       this.videoUrl = await this.getVideoUrl(video.id); this.playing = video; this.dialog = "player";
     });
   }
   private async renewVideo() {
-    if (!this.playing) return;
+    if (!this.playing || this.renewingVideo) return;
+    if (Date.now() - this.lastVideoRenewal < 30_000) {
+      this.fail(this.t("playbackError"));
+      return;
+    }
+    const playing = this.playing;
     const element = this.renderRoot.querySelector("video");
     if (!element) return;
     const seek = element.currentTime, paused = element.paused;
+    this.renewingVideo = true;
+    this.lastVideoRenewal = Date.now();
     try {
-      this.videoUrl = await this.getVideoUrl(this.playing.id);
+      const url = await this.getVideoUrl(playing.id);
+      if (this.playing !== playing) return;
+      this.videoUrl = url;
       await this.updateComplete;
       element.addEventListener("loadedmetadata", () => { element.currentTime = seek; if (!paused) void element.play(); }, { once: true });
       element.load();
     } catch (error) { this.fail(error); }
+    finally { this.renewingVideo = false; }
   }
   private async download(video: Video) {
     await this.operation(async () => {

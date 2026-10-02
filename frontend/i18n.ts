@@ -28,6 +28,7 @@ const en = {
   sourceHint: "Files must be visible inside the Home Assistant container. Subfolders are not scanned.",
   cameraId: "Camera ID", tip: "A little time. A whole new perspective.", scheduleSaved: "Schedules saved",
   photos: "photos", back: "Back", disabled: "Off", enabled: "On",
+  playbackError: "Video could not be played. Check that the file still exists, or try downloading it.",
 };
 type Messages = { [K in keyof typeof en]: string };
 const tr: Messages = {
@@ -60,6 +61,7 @@ const tr: Messages = {
   sourceHint: "Dosyalar Home Assistant konteynerinden erişilebilir olmalı. Alt klasörler taranmaz.",
   cameraId: "Kamera kimliği", tip: "Biraz zaman. Yepyeni bir bakış.", scheduleSaved: "Zamanlama kaydedildi",
   photos: "fotoğraf", back: "Geri", disabled: "Kapalı", enabled: "Açık",
+  playbackError: "Video oynatılamadı. Dosyanın hâlâ mevcut olduğunu kontrol et veya indirmeyi dene.",
 };
 export type MessageKey = keyof Messages;
 export function messages(language: string): Messages { return language.startsWith("tr") ? tr : en; }

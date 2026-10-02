@@ -77,7 +77,7 @@ npx playwright install chromium
 npm test
 ```
 
-Full HA adapter tests require Home Assistant 2026.9 on Linux with Python 3.14; install `homeassistant==2026.9.0` alongside the test dependencies. They use the real service registry, websocket decorators, Store and HTTP authentication. Browser tests use a demo transport and synthetic clip; they do not imply a test on physical HA OS hardware. CI also runs Hassfest and HACS validation. Tagged releases run every CI job before creating the release asset.
+Full HA adapter tests require Home Assistant 2026.9 on Linux with Python 3.14; install `homeassistant==2026.9.0 ha-ffmpeg==3.2.2` alongside the test dependencies. They use the real service registry, websocket decorators, Store and HTTP authentication. Browser tests use a demo transport and synthetic clip; they do not imply a test on physical HA OS hardware. CI also runs Hassfest and HACS validation. Tagged releases run every CI job before creating the release asset.
 
 `npm run preview` serves demonstration data at `http://127.0.0.1:8124`. The demo page is development-only and is not included in the integration.
 

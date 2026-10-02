@@ -38,6 +38,19 @@ test("schedule changes persist and Turkish UI is available", async ({ page }) =>
   await expect(page.getByRole("button", { name: "Zamanlama", exact: true })).toBeVisible();
 });
 
+test("broken media stops refreshing signed URLs and shows an error", async ({ page }) => {
+  let requests = 0;
+  await page.route("**/demo.mp4", async route => {
+    requests++;
+    await route.fulfill({ status: 200, contentType: "video/mp4", body: "invalid video" });
+  });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Library", exact: true }).click();
+  await page.getByRole("button", { name: "Watch", exact: true }).first().click();
+  await expect(page.getByRole("alert")).toContainText("Video could not be played");
+  expect(requests).toBe(2);
+});
+
 test("viewers only see the library and cannot configure or delete", async ({ page }) => {
   await page.goto("/?viewer");
   await expect(page.getByRole("button", { name: "Settings", exact: true })).toHaveCount(0);
