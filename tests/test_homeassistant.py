@@ -16,8 +16,10 @@ pytest.importorskip("homeassistant", reason="Home Assistant adapter tests run on
 
 from aiohttp import web
 from aiohttp.test_utils import TestClient, TestServer
+from homeassistant import config_entries, loader
 from homeassistant.auth import auth_manager_from_config
 from homeassistant.auth.const import GROUP_ID_ADMIN, GROUP_ID_READ_ONLY
+from homeassistant.bootstrap import async_load_base_functionality
 from homeassistant.components.http import KEY_HASS
 from homeassistant.components.http.auth import async_setup_auth, async_sign_path
 from homeassistant.components.websocket_api.connection import ActiveConnection
@@ -41,6 +43,9 @@ async def ha(tmp_path, ffmpeg):
     media.mkdir()
     (tmp_path / "www").mkdir()
     hass.config.media_dirs = {"local": str(media)}
+    hass.config_entries = config_entries.ConfigEntries(hass, {})
+    loader.async_setup(hass)
+    assert await async_load_base_functionality(hass)
     hass.auth = await auth_manager_from_config(hass, [], [])
     admin = await hass.auth.async_create_user("Admin", group_ids=[GROUP_ID_ADMIN])
     viewer = await hass.auth.async_create_user("Viewer", group_ids=[GROUP_ID_READ_ONLY])

@@ -62,7 +62,7 @@ All commands use the existing authenticated Home Assistant WebSocket connection.
 | `ha_tgen/state` | Current settings, cameras, jobs and videos; viewers receive only camera names/IDs and gallery data |
 | `ha_tgen/subscribe` | Push state changes; unsubscribe through HA's standard subscription command |
 | `ha_tgen/manage` | Administrator-only operation; takes `action` and `data` |
-| `ha_tgen/video_url` | Takes an indexed video `id`; returns a ten-minute signed playback/download URL |
+| `ha_tgen/video_url` | Takes an indexed `video_id`; returns a ten-minute signed playback/download URL |
 
 Management actions are `save_camera`, `delete_camera`, `preview`, `save_settings`, `generate`, `cancel`, `retry`, `delete_video`. Camera save accepts the fields above plus optional existing `id`; deletion/cancellation/retry uses `{"id": "..."}`. Preview accepts a camera definition and returns count, skipped count, samples and warnings. Settings save takes `output_root` and `retention_days` (`0` disables retention). Generate uses the same fields as the HA action.
 

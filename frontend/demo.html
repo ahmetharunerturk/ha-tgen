@@ -22,7 +22,10 @@ panel.hass = { language: params.get("lang") || "en", user: { is_admin: admin }, 
   subscribeMessage: async (callback) => { callbacks.add(callback); publish(); return () => callbacks.delete(callback); },
   sendMessagePromise: async (message) => {
     requests.push(message);
-    if (message.type === "ha_tgen/video_url") return { url: "/demo.mp4" };
+    if (message.type === "ha_tgen/video_url") {
+      if (!message.video_id) throw new Error("video_id is required");
+      return { url: "/demo.mp4" };
+    }
     if (!admin) throw new Error("Unauthorized");
     const data = message.data;
     if (message.action === "preview") return { count: 2160, skipped: 2, samples: [{ filename: `${data.prefix}20260915_120000.jpg`, timestamp: "2026-09-15T12:00:00" }], warnings: [] };
