@@ -51,7 +51,9 @@ async def ha(tmp_path, ffmpeg):
     viewer = await hass.auth.async_create_user("Viewer", group_ids=[GROUP_ID_READ_ONLY])
     admin_token = await hass.auth.async_create_refresh_token(admin, client_id="http://localhost")
     viewer_token = await hass.auth.async_create_refresh_token(viewer, client_id="http://localhost")
-    hass.http = SimpleNamespace(async_register_static_paths=AsyncMock(), register_view=Mock())
+    hass.http = SimpleNamespace(
+        async_register_static_paths=AsyncMock(), register_view=Mock(), supervisor_unix_socket_path=None
+    )
     hass.data["ffmpeg"] = SimpleNamespace(binary=ffmpeg)
     callbacks = []
     entry = SimpleNamespace(data={"output_root": str(media / "ha_tgen")}, async_on_unload=callbacks.append)
