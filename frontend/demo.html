@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Timelapse · demo</title><style>body{margin:0;background:#f6f7f4}ha-tgen-panel{display:block}</style></head><body>
+<ha-tgen-panel></ha-tgen-panel>
+<script type="module">
+import "/panel.js";
+const camera = (id, name, prefix) => ({ id, name, source_dir: `/config/www/${prefix}/snapshots`, prefix: `${prefix}_`, timestamp_format: "%Y%m%d_%H%M%S", fps: 12, yearly_fps: 24, crf: 23, resolution: "source", timeout: 3600, schedules: { weekly: { enabled: false, time: "00:15" }, monthly: { enabled: false, time: "00:30" }, yearly: { enabled: false, time: "01:00" } } });
+const camera1 = camera("11111111111141118111111111111111", "Garden overview", "trackmix");
+const camera2 = camera("22222222222242228222222222222222", "Greenhouse detail", "trackmix1");
+let state = { settings: { output_root: "/media/ha_tgen", retention_days: 0 }, cameras: [camera1, camera2], jobs: [], videos: [
+  { id: "33333333333343338333333333333333", camera_id: camera1.id, camera_name: camera1.name, mode: "weekly", start_date: "2026-09-21", end_date: "2026-09-27", created_at: "2026-09-28T00:15:00+00:00", frames: 504, fps: 12, size: 6200000, duration: 42, latest: true },
+  { id: "44444444444444448444444444444444", camera_id: camera2.id, camera_name: camera2.name, mode: "monthly", start_date: "2026-09-01", end_date: "2026-09-30", created_at: "2026-10-01T00:30:00+00:00", frames: 2160, fps: 12, size: 18500000, duration: 180, latest: true },
+  { id: "55555555555545558555555555555555", camera_id: camera1.id, camera_name: camera1.name, mode: "yearly", start_date: "2026-01-01", end_date: "2026-10-02", created_at: "2026-10-02T01:00:00+00:00", frames: 18000, fps: 24, size: 84000000, duration: 750, latest: true }
+], source_roots: ["/config/www", "/media"], output_roots: ["/media", "/config/ha_tgen"], timezone: "Europe/Berlin" };
+const params = new URLSearchParams(location.search);
+if (params.has("empty")) state = { ...state, cameras: [], videos: [] };
+const admin = !params.has("viewer");
+let callbacks = new Set();
+const publish = () => callbacks.forEach(callback => callback(structuredClone(admin ? state : { ...state, settings: {}, jobs: [], source_roots: [], output_roots: [], cameras: state.cameras.map(c => ({ id: c.id, name: c.name })) })));
+const panel = document.querySelector("ha-tgen-panel");
+const requests = [];
+panel.hass = { language: params.get("lang") || "en", user: { is_admin: admin }, connection: {
+  subscribeMessage: async (callback) => { callbacks.add(callback); publish(); return () => callbacks.delete(callback); },
+  sendMessagePromise: async (message) => {
+    requests.push(message);
+    if (message.type === "ha_tgen/video_url") return { url: "/demo.mp4" };
+    if (!admin) throw new Error("Unauthorized");
+    const data = message.data;
+    if (message.action === "preview") return { count: 2160, skipped: 2, samples: [{ filename: `${data.prefix}20260915_120000.jpg`, timestamp: "2026-09-15T12:00:00" }], warnings: [] };
+    if (message.action === "save_camera") {
+      const value = { ...data, id: data.id || crypto.randomUUID().replaceAll("-", "") };
+      state.cameras = [...state.cameras.filter(c => c.id !== value.id), value]; publish(); return value;
+    }
+    if (message.action === "delete_camera") state.cameras = state.cameras.filter(c => c.id !== data.id);
+    if (message.action === "delete_video") state.videos = state.videos.filter(v => v.id !== data.id);
+    if (message.action === "save_settings") state.settings = data;
+    if (message.action === "generate") {
+      const ids = data.camera_ids.map(() => crypto.randomUUID().replaceAll("-", ""));
+      data.camera_ids.forEach((cameraId, index) => {
+        const source = state.cameras.find(c => c.id === cameraId);
+        state.jobs.unshift({ id: ids[index], camera_id: source.id, camera_name: source.name, mode: data.mode, status: "succeeded", start_date: data.start_date || "2026-09-21", end_date: data.end_date || "2026-09-27", created_at: new Date().toISOString(), processed: 2160, total: 2160, frames: 2160, skipped: 0, warnings: [], video_id: ids[index] });
+        state.videos.unshift({ id: ids[index], camera_id: source.id, camera_name: source.name, mode: data.mode, start_date: data.start_date || "2026-09-21", end_date: data.end_date || "2026-09-27", created_at: new Date().toISOString(), frames: 2160, fps: 12, size: 18500000, duration: 180, latest: true });
+      }); publish(); return { job_ids: ids };
+    }
+    publish(); return null;
+  }
+} };
+window.demo = { panel, requests, getState: () => state, publish };
+</script></body></html>

@@ -1,0 +1,36 @@
+generate:
+  name: Generate timelapse
+  description: Queue videos for one or more configured cameras. Returns job_ids when a response is requested.
+  fields:
+    camera_ids:
+      name: Camera IDs
+      description: Stable camera IDs shown in the Timelapse panel.
+      required: true
+      example: ["2d3f9681a6e945f98da5e70aace1d232"]
+      selector:
+        object:
+    mode:
+      name: Period
+      required: true
+      selector:
+        select:
+          options: [weekly, monthly, yearly, custom]
+    start_date:
+      name: Start date
+      description: Required in custom mode, inclusive.
+      selector:
+        date:
+    end_date:
+      name: End date
+      description: Required in custom mode, inclusive.
+      selector:
+        date:
+cancel:
+  name: Cancel timelapse
+  description: Cancel a queued or running job.
+  fields:
+    job_id:
+      name: Job ID
+      required: true
+      selector:
+        text:

@@ -1,0 +1,26 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "HA Timelapse Generator",
+        "description": "Home Assistant medya klasörü altında özel bir çıktı klasörü seçin (varsayılan /media/ha_tgen). /config/ha_tgen de kullanılabilir. Kurulumdan sonra yan menüdeki Timelapse panelinden fotoğraf kaynaklarını ve zamanlamaları ekleyin.",
+        "data": {"output_root": "Video çıktı klasörü"}
+      }
+    },
+    "error": {"invalid_directory": "Bir medya klasörü veya /config/ha_tgen altında mutlak, yazılabilir bir klasör seçin."},
+    "abort": {"already_configured": "Timelapse Generator zaten yapılandırılmış."}
+  },
+  "services": {
+    "generate": {
+      "name": "Timelapse oluştur",
+      "description": "Yapılandırılmış fotoğraf kaynaklarından videoları sıraya ekler.",
+      "fields": {
+        "camera_ids": {"name": "Kamera kimlikleri", "description": "Timelapse panelinde gösterilen sabit kamera kimliklerini seçin."},
+        "mode": {"name": "Dönem", "description": "Önceki hafta, önceki ay, yılbaşından bugüne veya özel tarihler."},
+        "start_date": {"name": "Başlangıç tarihi", "description": "Özel dönem için dahil başlangıç tarihi."},
+        "end_date": {"name": "Bitiş tarihi", "description": "Özel dönem için dahil bitiş tarihi."}
+      }
+    },
+    "cancel": {"name": "Timelapse iptal et", "description": "Bekleyen veya çalışan görevi iptal eder.", "fields": {"job_id": {"name": "Görev kimliği", "description": "Oluştur eyleminin döndürdüğü kimlik."}}}
+  }
+}

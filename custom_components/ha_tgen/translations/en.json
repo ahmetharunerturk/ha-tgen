@@ -1,0 +1,26 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "HA Timelapse Generator",
+        "description": "Choose a private output directory inside a Home Assistant media directory (default /media/ha_tgen), or /config/ha_tgen. Add photo sources and schedules in the Timelapse sidebar panel after setup.",
+        "data": {"output_root": "Video output directory"}
+      }
+    },
+    "error": {"invalid_directory": "Choose an absolute, writable directory inside a configured media directory or /config/ha_tgen."},
+    "abort": {"already_configured": "Timelapse Generator is already configured."}
+  },
+  "services": {
+    "generate": {
+      "name": "Generate timelapse",
+      "description": "Queue timelapse videos from configured photo sources.",
+      "fields": {
+        "camera_ids": {"name": "Camera IDs", "description": "Select the stable IDs shown in the Timelapse panel."},
+        "mode": {"name": "Period", "description": "Previous week, previous month, year to date, or custom dates."},
+        "start_date": {"name": "Start date", "description": "Inclusive start date for custom mode."},
+        "end_date": {"name": "End date", "description": "Inclusive end date for custom mode."}
+      }
+    },
+    "cancel": {"name": "Cancel timelapse", "description": "Cancel a queued or running job.", "fields": {"job_id": {"name": "Job ID", "description": "ID returned by the generate action."}}}
+  }
+}
